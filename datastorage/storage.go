@@ -6,27 +6,25 @@ import (
 	"math/rand"
 )
 
-const codeLength = 10
+const CodeLength = 10
 
-var allowedChars = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
+var AllowedChars = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
 
-// Storage определяет интерфейс для работы с хранилищем URL
 type Storage interface {
 	Get(code string) (string, error)
 	Save(url, code string) error
 	FindByURL(url string) (string, error)
 }
 
-// generateCode генерирует случайный код длиной codeLength
 func GenerateCode() string {
-	b := make([]rune, codeLength)
+	b := make([]rune, CodeLength)
 	for i := range b {
-		b[i] = allowedChars[rand.Intn(len(allowedChars))]
+		b[i] = AllowedChars[rand.Intn(len(AllowedChars))]
 	}
 	return string(b)
 }
 
-// ---------- Реализация in-memory хранилища ----------
+// in-memory хранилище
 
 type InMemoryStorage struct {
 	codeToURL map[string]string
@@ -65,7 +63,7 @@ func (s *InMemoryStorage) FindByURL(url string) (string, error) {
 	return code, nil
 }
 
-// ---------- Реализация PostgreSQL хранилища ----------
+// postgreSQL хранилище
 
 type PostgresStorage struct {
 	db *sql.DB
@@ -76,7 +74,7 @@ func NewPostgresStorage(connStr string) (*PostgresStorage, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Создаем таблицу, если она отсутствует
+
 	query := `
 	CREATE TABLE IF NOT EXISTS urls (
 		code VARCHAR(10) PRIMARY KEY,

@@ -3,18 +3,15 @@ package main
 import (
 	"flag"
 	"log"
-	"math/rand"
 	"net/http"
-	"time"
 
-	"./datastorage"
+	"github.com/MostovykhGit/urlshortener/datastorage"
 )
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
-	storageType := flag.String("storage", "memory", "Storage type: memory or postgres")
-	pgConn := flag.String("pg_conn", "", "Postgres connection string")
-	port := flag.String("port", "8080", "Port to listen on")
+	storageType := flag.String("storage", "memory", "storage type: memory or postgres")
+	pgConn := flag.String("pg_conn", "", "postgres connection string")
+	port := flag.String("port", "8080", "port to listen to")
 	flag.Parse()
 
 	var storage datastorage.Storage
@@ -22,11 +19,11 @@ func main() {
 
 	if *storageType == "postgres" {
 		if *pgConn == "" {
-			log.Fatal("Postgres connection string must be provided")
+			log.Fatal("must provide postgres connection")
 		}
 		storage, err = datastorage.NewPostgresStorage(*pgConn)
 		if err != nil {
-			log.Fatalf("Failed to initialize Postgres storage: %v", err)
+			log.Fatalf("failed to initialize Postgres storage: %v", err)
 		}
 	} else {
 		storage = datastorage.NewInMemoryStorage()
